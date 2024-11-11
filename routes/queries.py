@@ -6,16 +6,20 @@ from routes.models import User
 from routes.hash_fuctions import get_password_hash
 from sqlalchemy import or_
 
+
 async def insert_post(post: PostCreateSchema, PostSchema):
 
     post = Post(**post)
     post.save()
 
+
 def get_post_by_id(db: Session, item_id: int):
     return db.query(Post).filter(Post.id == item_id).first()
 
+
 def get_post(db: Session, skip: int = 0, limit: int = 10):
     return db.query(Post).offset(skip).limit(limit).all()
+
 
 def insert_post(db: Session, post: PostCreateSchema):
     post_object = Post(**post.model_dump())
@@ -24,6 +28,7 @@ def insert_post(db: Session, post: PostCreateSchema):
     db.refresh(post_object)
 
     return PostSchema.from_orm(post_object)
+
 
 def delete_post(db: Session, item_id: int):
     post = get_post_by_id(db, item_id)
@@ -35,6 +40,7 @@ def delete_post(db: Session, item_id: int):
     db.commit()
     return item_id
 
+
 def post_update(db: Session, item_id: int, post: PostCreateSchema):
 
     post_in_db = db.query(Post).filter(Post.id == item_id).first()
@@ -45,13 +51,16 @@ def post_update(db: Session, item_id: int, post: PostCreateSchema):
     post_in_db.title = post.title
     post_in_db.author = post.author
     post_in_db.content = post.content
-    post_in_db.created_at = post.created_at  # Assuming you want to update the timestamp as well
+    post_in_db.created_at = (
+        post.created_at
+    )  # Assuming you want to update the timestamp as well
 
     # Commit the changes
     db.commit()
     db.refresh(post_in_db)
 
     return PostSchema.from_orm(post_in_db)
+
 
 def insert_user(db: Session, user: SignUp):
 
@@ -67,4 +76,8 @@ def insert_user(db: Session, user: SignUp):
 
 
 def find_user_by_username_or_email(db: Session, email, username):
-    return db.query(Post).filter(or_(User.email == email, User.username == username)).first()
+    return (
+        db.query(Post)
+        .filter(or_(User.email == email, User.username == username))
+        .first()
+    )

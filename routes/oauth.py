@@ -10,7 +10,7 @@ from routes.schemas import Token
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from database import get_db
-from routes.schemas import  SignUp
+from routes.schemas import SignUp
 from routes.queries import insert_user, find_user_by_username_or_email
 from routes.hash_fuctions import verify_password
 
@@ -45,6 +45,7 @@ def get_user(db, username: str):
     if username in db:
         user_dict = db[username]
         return UserInDB(**user_dict)
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -82,6 +83,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 def authenticate_user(fake_db, username: str, password: str):
     user = get_user(fake_db, username)
     if not user:
@@ -108,10 +110,13 @@ async def login_for_access_token(
     )
     return Token(access_token=access_token, token_type="bearer")
 
-@auth_router.post("/register")
-async def register_user(user: SignUp, db : Session = Depends(get_db)):
 
-    exsisted_user = find_user_by_username_or_email(db=db, email=user.email, username=user.username)
+@auth_router.post("/register")
+async def register_user(user: SignUp, db: Session = Depends(get_db)):
+
+    exsisted_user = find_user_by_username_or_email(
+        db=db, email=user.email, username=user.username
+    )
 
     if exsisted_user:
         raise HTTPException(
@@ -126,6 +131,6 @@ async def register_user(user: SignUp, db : Session = Depends(get_db)):
     content = {
         "data": user_object,
         "message": "Created",
-        "status": status.HTTP_201_CREATED
+        "status": status.HTTP_201_CREATED,
     }
     return content

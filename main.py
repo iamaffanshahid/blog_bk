@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 import uvicorn
 from routes.user import user_router
@@ -11,21 +10,20 @@ from database import engine
 app = FastAPI()
 
 
-app.include_router(auth_router, prefix='/api', tags=['auth'])
-app.include_router(user_router, prefix='/api', tags=['users'])
-app.include_router(post_router, prefix='/api', tags=['post'])
+app.include_router(auth_router, prefix="/api", tags=["auth"])
+app.include_router(user_router, prefix="/api", tags=["users"])
+app.include_router(post_router, prefix="/api", tags=["post"])
 
 
-@app.get('/')
+@app.get("/")
 async def root():
-    return {
-        "message": "API is working"
-    }
+    return {"message": "API is working"}
 
 
 def create_tables():
-	print("create_tables")
-	Base.metadata.create_all(bind=engine)
+    print("create_tables")
+    Base.metadata.create_all(bind=engine)
+
 
 if __name__ == "__main__":
     create_tables()
